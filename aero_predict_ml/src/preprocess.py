@@ -10,13 +10,13 @@ def load_and_clean_data(file_path):
 
     df = df[df['CANCELLED'] == 0]
 
-    df['IS_DELAYED'] = (df['ARRIVAL_DELAY'] > 15).astype(int)
-
-    df['SCHEDULED_DEPARTURE'] = df['SCHEDULED_DEPARTURE'] // 100
+    hours = df['SCHEDULED_DEPARTURE'] // 100
+    minutes = df['SCHEDULED_DEPARTURE'] % 100
+    df['SCHEDULED_DEPARTURE'] = (hours * 60) + minutes
 
     features = ['MONTH', 'DAY', 'DAY_OF_WEEK', 'AIRLINE',
                 'ORIGIN_AIRPORT', 'DESTINATION_AIRPORT',
-                'SCHEDULED_DEPARTURE', 'DISTANCE', 'IS_DELAYED']
+                'SCHEDULED_DEPARTURE', 'DISTANCE', 'ARRIVAL_DELAY']
 
     df = df[features].dropna()
     return df
@@ -24,14 +24,14 @@ def load_and_clean_data(file_path):
 
 def encode_categorical(df):
     categorical_cols = ['AIRLINE', 'ORIGIN_AIRPORT', 'DESTINATION_AIRPORT']
-    encoders = {}
+    encoders_dict = {}
 
     for col in categorical_cols:
         le = LabelEncoder()
         df[col] = le.fit_transform(df[col].astype(str))
-        encoders[col] = le
+        encoders_dict[col] = le
 
-    return df, encoders
+    return df, encoders_dict
 
 
 if __name__ == "__main__":
@@ -57,7 +57,6 @@ if __name__ == "__main__":
             os.makedirs(models_dir)
 
         df_final.to_csv(processed_data_path, index=False)
-
 
         print(f"Succesfully processed files!")
         print(f"Procesed data: {processed_data_path}")
