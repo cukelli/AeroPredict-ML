@@ -27,12 +27,10 @@ class FlightPredictor:
 
         df = df[feature_order]
 
-        prediction = self.model.predict(df)[0]
-        probability = self.model.predict_proba(df)[0][1]
+        delay_minutes = self.model.predict(df)[0]
 
         return {
-            "is_delayed": bool(prediction),
-            "probability": round(float(probability), 4)
+            "predicted_delay_minutes": max(0, round(float(delay_minutes)))
         }
 
 
@@ -50,9 +48,9 @@ if __name__ == "__main__":
         'AIRLINE': 'AA',
         'ORIGIN_AIRPORT': 'JFK',
         'DESTINATION_AIRPORT': 'LAX',
-        'SCHEDULED_DEPARTURE': 14,
+        'SCHEDULED_DEPARTURE': 870,
         'DISTANCE': 2475
     }
 
     result = predictor.predict(sample_flight)
-    print(f"Prediction Result: {result}")
+    print(f"Prediction Result: Estimated delay is {result['predicted_delay_minutes']} minutes.")
