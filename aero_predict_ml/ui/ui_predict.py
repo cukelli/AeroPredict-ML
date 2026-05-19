@@ -11,19 +11,28 @@ css = """
     background-attachment: fixed;
 }
 
-/* Ovo uklanja belu pozadinu, senke i okvire sa glavnog panela */
 .contain, .gradio-container > div {
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }
 
-.gradio-container label, .gradio-container span {
+.gradio-container label, 
+.gradio-container span, 
+.gradio-container h1, 
+.gradio-container p,
+.gradio-container .markdown-text {
     background-color: transparent !important;
     font-weight: bold !important;
-    color: #333 !important;
+    color: white !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
-
+.gradio-container h1 {
+    background-color: transparent !important;
+    font-weight: bold !important;
+    color: #000000 !important; 
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.6); 
+}
 .form {
     background: transparent !important;
     border: none !important;
@@ -44,14 +53,18 @@ ROUTE_DATA = {
     "Denver (DEN) -> Las Vegas (LAS)": {"origin": "DEN", "dest": "LAS", "dist": 607}
 }
 
-def predict_flight_delay(airline_code, departure_time, route_selection):
 
+def predict_flight_delay(airline_code, departure_time, route_selection):
     try:
         if not departure_time or len(departure_time) != 4:
             return "Error: Please enter time in HHMM format (e.g., 0815 for 8:15 AM)."
 
         now = datetime.datetime.now()
         route_info = ROUTE_DATA.get(route_selection)
+
+        hours = int(departure_time[:2])
+        minutes = int(departure_time[2:])
+        total_minutes_from_midnight = (hours * 60) + minutes
 
         sample = {
             'MONTH': now.month,
@@ -60,17 +73,22 @@ def predict_flight_delay(airline_code, departure_time, route_selection):
             'AIRLINE': airline_code.strip().upper(),
             'ORIGIN_AIRPORT': route_info['origin'],
             'DESTINATION_AIRPORT': route_info['dest'],
-            'SCHEDULED_DEPARTURE': int(departure_time[:2]),
+            'SCHEDULED_DEPARTURE': total_minutes_from_midnight,
             'DISTANCE': route_info['dist']
         }
 
         result = predictor.predict(sample)
-        probability = result['probability'] * 100
+        delay_minutes = result['predicted_delay_minutes']
 
-        return f"Prediction for {route_selection}: There is a {probability:.0f}% chance of delay."
+        if delay_minutes == 0:
+            return f"Prediction for {route_selection} with {airline_code.upper()}:\nThe flight is expected to be ON " \
+                   f"TIME."
+        else:
+            return f"Prediction for {route_selection} with {airline_code.upper()}:\nEstimated delay is {delay_minutes} minutes."
 
     except Exception as e:
         return f"System Error: {str(e)}"
+
 
 app = gr.Interface(
     fn=predict_flight_delay,
@@ -79,9 +97,8 @@ app = gr.Interface(
         gr.Textbox(label="Scheduled Departure (HHMM)", placeholder="e.g., 1430"),
         gr.Dropdown(choices=list(ROUTE_DATA.keys()), label="Select US Route", value=list(ROUTE_DATA.keys())[0])
     ],
-    outputs="text",
+    outputs=gr.Textbox(label="Flight delay"),
     title="AeroPredict-ML: Aviation Analytics System",
-    description="ML tool predicting flight delays using Random Forest and real-time parameters.",
     css=css
 )
 
