@@ -79,4 +79,4 @@ To determine if the model would benefit from more historical data, a learning cu
 
 The graph below shows that as we add more flights to the training set, the error (MAE) drops and then stabilizes. This flattening means the model has learned everything it can from chosen
 features. This means our dataset is large enough for this task.
-![Learning Curve - Random Forest Regressor](reports/learning_curve_plot.png)
+![Learning Curve - Random Forest Regressor](aero_predict_ml/reports/learning_curve_plot.png)
