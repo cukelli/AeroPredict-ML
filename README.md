@@ -13,6 +13,15 @@ This project utilizes historical flight data to train regression models capable 
 - **Learning Curve Analysis**: Includes subset-evaluation scripts to monitor data volume scaling vs. test error behavior.
 - **Gradio UI**: Web dashboard that maps textual inputs (airports and airlines) into coded features for delay predictions.
 
+# Dataset
+
+The model is trained on well-known [**2015 Flight Delays and Cancellations**](https://www.kaggle.com/datasets/usdot/flight-delays) dataset, originally published by the U.S. Department of Transportation's (DOT) Bureau of Transportation Statistics.
+
+* **Scope**: The original dataset contains data for roughly 5.8 million commercial flights across the United States in 2015.
+* **Project Utilization**: To optimize processing time, a subset of 100,000 flights is utilized in this project.
+* **Core Predictors**: The system isolates parameters such as **`MONTH`**, **`DAY`**, **`DAY_OF_WEEK`**, **`AIRLINE`**, **`ORIGIN_AIRPORT`**, **`DESTINATION_AIRPORT`**, **`SCHEDULED_DEPARTURE`**, and **`DISTANCE`** to predict the **`ARRIVAL_DELAY`**.
+
+📁 Project Structure
 # 📁 Project Structure
 
 ```text
